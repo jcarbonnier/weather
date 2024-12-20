@@ -1,0 +1,53 @@
+<div class="sidebar-container d-flex flex-column flex-shrink-0 p-1 h-100 bg-secondary">
+  <div class="container-fluid my-2 text-white">
+    <LinkTo @route="private.index" class="navbar-brand">
+      <i class="bi bi-hurricane me-1 h3"></i> <span class="h3">{{t 'brand'}}</span>
+    </LinkTo>
+    <div>
+      {{t 'introduction'}}
+    </div>
+  </div>
+
+  <hr class="my-2">
+
+  <div class="nav flex-column">
+    <a href="/api-docs/" target="_blank" class="nav-link d-flex align-items-center gap-2">
+      Swagger
+    </a>
+  </div>
+  <hr class="my-2">
+
+  {{#if this.session.isAuthenticated}}
+  <div class="dropdown">
+    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-white"
+      data-bs-toggle="dropdown">
+      <i class="bi bi-person-circle p-2"></i>
+      <strong>{{this.session.currentUser.login}}</strong>
+    </a>
+    <ul class="dropdown-menu text-small shadow">
+      <li>
+        <a class="nav-link d-flex align-items-center gap-2" href="#" {{on "click" this.invalidateSession}}>
+          {{t 'menus.logout'}}
+        </a>
+      </li>
+    </ul>
+  </div>
+  <hr class="my-2">
+
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <LinkTo @route="private.index" class="nav-link d-flex align-items-center gap-2">
+        <i class="bi bi-search me-1"></i> {{t 'menus.search'}}
+      </LinkTo>
+    </li>
+    {{#each this.session.currentUser.weatherLocations as |item|}}
+    <li class="nav-item">
+      <LinkTo class="nav-link d-flex align-items-center gap-2" @route="private.weather-locations.show"
+        @model={{item.id}}>
+        <i class="bi bi-bookmark me-1"></i> {{item.name}} ({{item.country}})<br>
+      </LinkTo>
+    </li>
+    {{/each}}
+  </ul>
+  {{/if}}
+</div>

@@ -1,0 +1,88 @@
+/**
+* BOOTSTRAP ICONS STYLES
+*/
+$bootstrap-icons-font-dir: "/assets/fonts" !default;
+
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons";
+
+/**
+* BOOTSTRAP STYLES
+*/
+// Bootstrap static files (no sass)
+// @import "bootstrap.min";
+
+// Bootstrap dynamic files (sass)
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+// Bootstrap configuration
+// @import "functions";
+// @import "variables";
+// @import "mixins";
+// @import "utilities";
+// // Layout & components
+// @import "root";
+// @import "reboot";
+// @import "type";
+// @import "images";
+// @import "containers";
+// @import "grid";
+// @import "tables";
+// @import "forms";
+// @import "buttons";
+// @import "transitions";
+// @import "dropdown";
+// @import "button-group";
+// @import "nav";
+// @import "navbar";
+// @import "card";
+// @import "accordion";
+// @import "breadcrumb";
+// @import "pagination";
+// @import "badge";
+// @import "alert";
+// @import "progress";
+// @import "list-group";
+// @import "close";
+// @import "toasts";
+// @import "modal";
+// @import "tooltip";
+// @import "popover";
+// @import "carousel";
+// @import "spinners";
+// @import "offcanvas";
+// @import "placeholders";
+// // Helpers
+// @import "helpers";
+// // Utilities
+// @import "utilities/api";
+
+/**
+* EMBER POWER SELECT package
+*/
+@import "ember-power-select/themes/bootstrap";
+@import "ember-power-select";
+
+.form-floating.select {
+  label {
+    @extend .text-muted;
+
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+  }
+}
+
+.ember-power-select-trigger {
+  padding: 20px 16px 4px 4px;
+  min-height: 58px;
+
+  &.is-invalid {
+    border-color: $danger;
+  }
+}
+
+.ember-power-select-placeholder {
+  margin-left: 0;
+}
+
+.ember-basic-dropdown-content {
+  z-index: 1060;
+}

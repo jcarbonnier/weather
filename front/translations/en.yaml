@@ -1,0 +1,94 @@
+brand: "Weather app"
+introduction: Mon application météo
+
+# ----- Metas
+# ----- Attributes
+attributes:
+  id: Id.
+  name: Nom
+  date: Date
+  description: Description
+  enabled: Activé
+  firstname: Prénom
+  lastname: Nom
+  email: Email
+  createdAt: Créé le
+  updatedAt: MAJ le
+  address: Adresse
+  postalCode: Code postal
+  city: Ville
+  country: Pays
+  locale: Langue
+  dropzone:
+    base: Glissez et déposez vos fichiers dans cette zone ou
+    release: Déposer le fichier
+    click: cliquez ici
+    uploading: Upload des fichiers en cours
+  days:
+    monday: Lundi
+    tuesday: Mardi
+    wednesday: Mercredi
+    thursday: Jeudi
+    friday: Vendredi
+    saturday: Samedi
+    sunday: Dimanche
+
+# ----- Menus
+menus:
+  home: "Accueil"
+  admin: Administration
+  profile: Mon compte
+  logout: Déconnexion
+  login: Connexion
+
+# ----- Breadcrumbs
+breadcrumbs:
+  home: Accueil
+  account: Mon compte
+
+# ----- Buttons
+buttons:
+  cancel: Annuler
+  save: Enregistrer
+  edit: Editer
+  confirm: Confirmer
+  previous: Précédent
+  next: Suivant
+  connect: Connexion
+  login: Je me connecte
+  send: Envoyer
+
+# ----- Notifications toast
+notifications:
+  success:
+    title: Succès
+    saved: Les données ont bien été enregistrées
+    deleted: Les données ont bien été supprimées
+  warning:
+    title: Attention
+  failure:
+    title: Echec
+    saved: Les données n'ont pas été enregistrées
+    main: Une erreur est survenue
+
+# ----- Modals
+modals:
+  confirm:
+    title: Confirmation
+    intro: Veuillez confirmer votre action
+
+# ----- Pagination
+pagination:
+  perPage: Par page
+  range: "{from}-{to} sur {total}"
+
+# ----- Login
+login:
+  title: Connexion
+  subtitle: Identification via le service Keycloak
+  keycloak: Nous utilisons le service d'authentification <b>Keycloak</b> pour garantir la sécurité et la confidentialité des informations personnelles conformément aux exigences de la <b>RGPD</b>.<br/><br/>En cliquant sur le lien ci-dessous, vous allez être redirigé vers la page de connexion.
+
+# ----- Home
+home:
+  intro: |-
+    Bienvenue dans votre gestionnaire de personnalisation.

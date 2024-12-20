@@ -1,0 +1,232 @@
+# You can override the included template(s) by including variable overrides
+# See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
+
+
+# --------------------------------------------------
+# PIPELINE STAGES
+# Define pipeline stages
+# --------------------------------------------------
+stages:
+  - cleanup
+  - build
+  - test
+  - quality
+  - security
+  # - review
+  # - dast
+  # - staging
+  # - canary
+  # - production
+  - release
+  # - incremental rollout 10%
+  # - incremental rollout 25%
+  # - incremental rollout 50%
+  # - incremental rollout 100%
+  # - performance
+
+
+# --------------------------------------------------
+# GLOBAL VARIABLES
+# Available in all jobs
+# --------------------------------------------------
+variables:
+  # --- APP vars
+  DOMAIN: weather.softier.fr
+  FRONT_PATH: /
+  FRONT_API_PATH: /api
+  SIDEKIQ_MONITOR_PATH: /sidekiq
+  RAILS_LOG_TO_STDOUT: "true"
+  RAILS_SERVE_STATIC_FILES: "true"
+  POSTGRES_HOST_AUTH_METHOD: trust
+  REDIS_URL: redis://redis:6379/0
+  # --- Templates vars
+  SAST_EXCLUDED_PATHS: nginx/www,api/swagger # SAST excluded paths
+  # SECURE_LOG_LEVEL: "debug" # SAST log level
+  CODECLIMATE_DEBUG: "true" # code quality debug
+  REPORT_FORMAT: "json" # code quality report format
+  DS_REMEDIATE: "false" # Gemnasium dependency scanning
+
+
+# --------------------------------------------------
+# INCLUDE YAML FILES
+# Include gitlab-ci config file for all project services
+# --------------------------------------------------
+include:
+  # --------------------
+  # Project configs
+  # --------------------
+  - local: _config/gitlab-ci/rules_common.yml
+  # --------------------
+  # Project templates
+  # --------------------
+  - local: api/.gitlab-ci.yml
+  - local: nginx/.gitlab-ci.yml
+  - local: front/.gitlab-ci.yml
+  # - local: sidekiq-monitor/.gitlab-ci.yml
+  # --------------------
+  # Security templates
+  # --------------------
+  # - template: Jobs/SAST.gitlab-ci.yml
+  # - template: Jobs/Secret-Detection.gitlab-ci.yml
+  # - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  # - template: Jobs/SAST-IaC.latest.gitlab-ci.yml
+  # ## ONLY ULTIMATE
+  # # - template: Security/Container-Scanning.gitlab-ci.yml
+  # # --------------------
+  # # Code quality templates
+  # # --------------------
+  # - template: Jobs/Code-Quality.gitlab-ci.yml
+
+
+# # --------------------------------------------------
+# # GEMNASIUM CONFIG
+# # --------------------------------------------------
+# gemnasium-dependency_scanning:
+#   variables:
+#     DS_REMEDIATE: "false"
+
+
+# --------------------------------------------------
+# SAST CONFIG
+#   Run SAST only on default and production branches
+# --------------------------------------------------
+# .sast_rules: &sast_rules
+#   rules:
+#     - if: $CI_COMMIT_TAG
+#       when: never
+#     - if: $CI_PIPELINE_SOURCE == 'api'
+#       when: never
+#     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+#       when: never
+#     - if: ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "production")
+
+# brakeman-sast:
+#   <<: *sast_rules
+# kics-iac-sast:
+#   <<: *sast_rules
+# nodejs-scan-sast:
+#   <<: *sast_rules
+# semgrep-sast:
+#   <<: *sast_rules
+# secret_detection:
+#   <<: *sast_rules
+
+
+# --------------------------------------------------
+# Code quality override
+#   Run Code quality only on default and production branches
+#   and specialized softier-cq runner
+#   Testing merge request event with $CI_PIPELINE_SOURCE == 'merge_request_event'
+# --------------------------------------------------
+# code_quality:
+#   <<: *sast_rules
+#   services:             # Shut off Docker-in-Docker
+#   # tags:
+#   #   - softier-cq-runner
+#   # needs: [build:nginx, build:api, build:front]
+
+
+# --------------------------------------------------
+# DEPOY COMMON CONFIG
+# --------------------------------------------------
+.deploy:
+  variables:
+    RAILS_ENV: production
+    PROJECT_TAG_BASE: weather
+  before_script:
+    - apk add --no-cache docker-compose git curl
+    - docker --version
+    - docker-compose --version
+    # - export TAG=$(git tag | sort -V | tail -1)
+    # - echo $TAG
+    - touch .env .env_db .env_redis
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+
+
+# --------------------------------------------------
+# CLEANUP STAGE
+# TODO: check if needed
+# It seems that cleanup is done into HOST machine,
+# so it is not necessary
+# --------------------------------------------------
+cleanup_docker:
+  image: $CI_REGISTRY/softier/commons/docker:latest
+  stage: cleanup
+  # only:
+  #   - production
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - docker image ls
+    - docker volume ls
+    # - docker system prune -af
+
+
+# --------------------------------------------------
+# BUILD STAGE
+# --------------------------------------------------
+# Create a Gitlab release based on tag created
+build:release:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "running release_job for ${CI_COMMIT_TAG}"
+  release:
+    name: 'Release version $CI_COMMIT_TAG'
+    description: '$CI_COMMIT_MESSAGE'
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_TAG'
+
+# Update CHANGELOG file automatically
+# Conflict problem with automatic changelog and git flow:
+# main received changelog from gitlab and main receive tag merge from local
+# release:changelog:
+#   stage: build
+#   extends: .deploy
+#   rules:
+#     - if: $CI_COMMIT_TAG
+#   script:
+#     - echo "Push changelog for version $CI_COMMIT_TAG and project $CI_PROJECT_ID"
+#     - 'curl --request POST --header "PRIVATE-TOKEN: $PRIVATE_ACCESS_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/repository/changelog?version=$CI_COMMIT_TAG"'
+
+
+
+# --------------------------------------------------
+# RELEASE STAGE
+# --------------------------------------------------
+release:deploy:
+  stage: release
+  image: "$CI_REGISTRY/softier/commons/docker:latest"
+  # only:
+  #   - production
+  rules:
+    - if: $CI_COMMIT_TAG
+  environment:
+    name: production
+    url: https://weather.softier.fr
+  # services:
+  #   - docker:dind
+  extends: .deploy
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # # Build with docker-compose
+    # - docker-compose -f docker-compose.prod.yml build
+    # Build with docker
+    - for i in api nginx; do docker image build --target prod -t ${PROJECT_TAG_BASE}-$i $i; done
+    # Tag service images to docker and push them into registry (1 tag for version, 1 tag for latest)
+    - for i in api nginx; do docker image tag ${PROJECT_TAG_BASE}-$i ${CI_REGISTRY_IMAGE}/$i:$CI_COMMIT_TAG; done
+    - for i in api nginx; do docker image tag ${PROJECT_TAG_BASE}-$i ${CI_REGISTRY_IMAGE}/$i; done
+    - for i in api nginx; do docker image push ${CI_REGISTRY_IMAGE}/$i:$CI_COMMIT_TAG; done
+    - for i in api nginx; do docker image push ${CI_REGISTRY_IMAGE}/$i; done
+    - sleep 5
+    # Deploy to portainer: $WEBHOOK_* variables are defined into gitlab
+    - curl -X POST ${WEBHOOK_WEATHER_MIGRATE}?tag=${CI_COMMIT_TAG}
+    - curl -X POST ${WEBHOOK_WEATHER_NGINX}?tag=${CI_COMMIT_TAG}
+    - curl -X POST ${WEBHOOK_WEATHER_API}?tag=${CI_COMMIT_TAG}
+    # - curl -X POST ${WEBHOOK_WEATHER_SIDEKIQ}?tag=${CI_COMMIT_TAG}
+    # - curl -X POST ${WEBHOOK_WEATHER_SIDEKIQ_MONITOR}?tag=${CI_COMMIT_TAG}

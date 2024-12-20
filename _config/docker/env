@@ -1,0 +1,27 @@
+# -------------------------
+# TRAEFIK SETUP
+# -------------------------
+DOMAIN=localhost
+FRONT_PATH=/
+FRONT_API_PATH=/api
+ADMINER_PATH=/adminer
+# SIDEKIQ_MONITOR_PATH=/sidekiq
+
+# -------------------------
+# RAILS env vars
+# -------------------------
+RAILS_ENV=development
+RAILS_LOG_TO_STDOUT=true
+RAILS_SERVE_STATIC_FILES=true
+SECRET_KEY_BASE=...
+
+# -------------------------
+# Gitlab packages token (private package registry)
+# Needed to pull private packages
+# -------------------------
+
+# -------------------------
+# External api secrets
+# -------------------------
+WEATHER_API_DOMAIN=https://api.weatherapi.com
+# WEATHER_API_KEY

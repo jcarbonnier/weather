@@ -1,0 +1,546 @@
+---
+openapi: 3.0.1
+info:
+  title: API appointment
+  version: v1
+paths:
+  "/api/users/{id}":
+    get:
+      summary: show user
+      tags:
+      - Private
+      description: Get a user
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: User id.
+        example: 1
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: successful
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      type:
+                        type: string
+                        example: users
+                      attributes:
+                        type: object
+                        properties:
+                          password:
+                            type: string
+                            nullable: true
+                            description: User password
+                            example: secret
+                        required:
+                        - login
+                      relationships:
+                        type: object
+                        properties:
+                          weather_locations:
+                            type: object
+                            description: Weather locations relationship.
+                            example:
+                              data:
+                              - id: '1'
+                                type: weather_locations
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                required:
+                - data
+        '401':
+          description: not authorized
+        '404':
+          description: not found
+  "/api/weather_locations":
+    get:
+      summary: list weather_locations
+      tags:
+      - Private
+      description: |
+        <b>Get weather locations</b>
+
+        Secured by user bearer token, the locations must belong to user
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: filter[name]
+        in: query
+        required: false
+        description: Filter locations by city name
+        example: London
+        schema:
+          type: string
+      responses:
+        '200':
+          description: weather_locations are filtered
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          example: weather_locations
+                        attributes:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation name
+                              example: Paris
+                            region:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation region
+                              example: Eure
+                            country:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation country
+                              example: France
+                            lat:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation latitude
+                              example: 33.78
+                            lon:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation longitude
+                              example: 48.78
+                          required:
+                          - name
+                          - country
+                          - lat
+                          - lon
+                        relationships:
+                          type: object
+                          properties:
+                            weather_forecasts:
+                              type: object
+                              description: Forecasts.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: weather_forecasts
+                            users:
+                              type: object
+                              description: Users.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: users
+                      required:
+                      - type
+                      - attributes
+                      - relationships
+                  meta:
+                    "$ref": "#/components/schemas/CollectionAnswerMeta"
+                required:
+                - data
+  "/api/weather_locations/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: WeatherLocation id.
+      example: 1
+      schema:
+        type: integer
+    get:
+      summary: show weather_location
+      tags:
+      - Private
+      description: |
+        <b>Get a weather_location</b>
+
+        Secured by user bearer token, the weather_location must belong to the same user
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: '1'
+                      type:
+                        type: string
+                        example: weather_locations
+                      attributes:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation name
+                            example: Paris
+                          region:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation region
+                            example: Eure
+                          country:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation country
+                            example: France
+                          lat:
+                            type: string
+                            nullable: false
+                            description: WeatherLocation latitude
+                            example: 33.78
+                          lon:
+                            type: string
+                            nullable: false
+                            description: WeatherLocation longitude
+                            example: 48.78
+                        required:
+                        - name
+                        - country
+                        - lat
+                        - lon
+                      relationships:
+                        type: object
+                        properties:
+                          weather_forecasts:
+                            type: object
+                            description: Forecasts.
+                            example:
+                              data:
+                              - id: '1'
+                                type: weather_forecasts
+                          users:
+                            type: object
+                            description: Users.
+                            example:
+                              data:
+                              - id: '1'
+                                type: users
+                    required:
+                    - type
+                    - attributes
+                    - relationships
+                required:
+                - data
+        '401':
+          description: not authorized
+        '404':
+          description: not found
+    delete:
+      summary: delete weather_location
+      tags:
+      - Private
+      description: |
+        <b>Delete a weather_location</b>
+
+        Secured by user bearer token, the weather_location must belong to the same user
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: successful
+        '404':
+          description: not found
+  "/api/sessions":
+    post:
+      summary: signin user
+      tags:
+      - Public
+      description: |
+        <b>Signin</b>
+
+        User signin
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: User signed in
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    nullable: false
+                    description: Session identifier.
+                    example: 1
+                  token:
+                    type: string
+                    nullable: true
+                    description: Session JWT token
+                    example: jwt
+                  login:
+                    type: string
+                    nullable: true
+                    description: Session login
+                    example: test
+                required:
+                - id
+                - login
+                - token
+        '422':
+          description: Invalid attribute
+          content:
+            application/vnd.api+json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: json
+              example:
+                user:
+                  login: test
+                  password: pws
+              properties:
+                user:
+                  type: object
+                  properties:
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          nullable: false
+                          description: Session identifier.
+                          example: 1
+                        token:
+                          type: string
+                          nullable: true
+                          description: Session JWT token
+                          example: jwt
+                        login:
+                          type: string
+                          nullable: true
+                          description: Session login
+                          example: test
+                      required:
+                      - id
+                      - login
+                      - token
+                  required:
+                  - login
+                  - password
+              required:
+              - user
+        required: true
+        description: Attributes login password are required.
+  "/api/users":
+    post:
+      summary: create user
+      tags:
+      - Public
+      description: |
+        <b>Create user</b>
+
+        Registering user
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: User created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      type:
+                        type: string
+                        example: users
+                      attributes:
+                        type: object
+                        properties:
+                          password:
+                            type: string
+                            nullable: true
+                            description: User password
+                            example: secret
+                        required:
+                        - login
+                      relationships:
+                        type: object
+                        properties:
+                          weather_locations:
+                            type: object
+                            description: Weather locations relationship.
+                            example:
+                              data:
+                              - id: '1'
+                                type: weather_locations
+                    required:
+                    - id
+                    - type
+                    - attributes
+                    - relationships
+                required:
+                - data
+        '422':
+          description: Invalid attribute
+          content:
+            application/vnd.api+json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: json
+              example:
+                data:
+                  type: users
+                  attributes:
+                    login: login
+                    password: secret password
+                    password_confirmation: secret password
+              properties:
+                data:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                          example: users
+                        attributes:
+                          type: object
+                          properties:
+                            password:
+                              type: string
+                              nullable: true
+                              description: User password
+                              example: secret
+                          required:
+                          - login
+                        relationships:
+                          type: object
+                          properties:
+                            weather_locations:
+                              type: object
+                              description: Weather locations relationship.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: weather_locations
+                      required:
+                      - id
+                      - type
+                      - attributes
+                      - relationships
+                  required:
+                  - login
+                  - password
+                  - password_confirmation
+              required:
+              - data
+        required: true
+        description: Attributes login password password_confirmatoion are required.
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              detail:
+                type: string
+              source:
+                type: object
+                properties:
+                  pointer:
+                    type: string
+      description: Required body parameters not found or invalid
+      example:
+        errors:
+        - source:
+            pointer: "/data/attributes/name"
+          detail: doit être rempli(e)
+    CollectionAnswerMeta:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+          description: Total number of results.
+        page:
+          type: integer
+          example: 5
+          description: Current page for paginated result.
+        page_size:
+          type: integer
+          example: 10
+          description: Result number per page.
+        pages:
+          type: integer
+          example: 10
+          description: Total number of pages.
+        sort:
+          type: string
+          example: id
+          description: Current results sorting.
+        direction:
+          type: string
+          example: asc
+          description: Current results sorting direction.
+      required:
+      - total
+      - page
+      - page_size
+      - pages
+      - sort
+      - direction

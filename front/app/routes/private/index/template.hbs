@@ -1,0 +1,31 @@
+{{page-title "Index"}}
+
+<strong>Bienvenue sur l'application de météo.</strong><br>
+<p>
+  Choisissez une ville dans le menu de gauche pour afficher les prévisions.
+</p>
+<p>
+  Ou recherche une ville pour l'ajouter à la liste:
+</p>
+<div class="content-filters mb-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 bg-secondary-subtle pb-3">
+    <Form::InputFloatingDelayed class="col" @label={{t 'content.filterBy' value=(t 'attributes.name')}}
+      @value={{this.name}} @onChange={{action this.nameChanged}} />
+  </div>
+</div>
+<ol class="list-group list-group-flush">
+  {{#each this.model as |item|}}
+  <li class="list-group-item d-flex justify-content-between align-items-start">
+    <div class="ms-2 me-auto">
+      <div class="fw-bold">{{item.country}}</div>
+      {{item.region}} ({{item.lat}}, {{item.lon}})<br><br>
+      <a href="#" class="btn btn-primary btn-sm mb-2" {{on 'click' (fn this.bookmarkLocation item)}}>Ajouter aux favoris</a>
+    </div>
+    <span class="badge text-bg-secondary rounded-pill">{{item.name}}</span>
+  </li>
+  {{else}}
+  <li class="list-group-item d-flex justify-content-between align-items-start">
+    {{t 'content.noResult'}}
+  </li>
+  {{/each}}
+</ol>

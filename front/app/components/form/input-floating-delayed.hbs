@@ -1,0 +1,20 @@
+<div ...attributes>
+  <div class="form-floating">
+    <Input
+      id="input-{{this.uid}}"
+      class="form-control form-control-sm
+        {{@inputClass}}
+        {{this.validationClass}}"
+      @type={{@inputType}}
+      @value={{this.tempValue}}
+      step={{@step}}
+      placeholder="place {{@placeholder}} "
+      onKeyUp={{this.handleKeyUp}}
+      disabled={{@disabled}}
+    />
+    <label for="input-{{this.uid}}" class="form-label">{{@label}}</label>
+    <div id="validation-{{this.uid}}" class="invalid-feedback">
+      {{this.errorsJoined}}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+{{page-title (t 'menus.login')}}
+
+<div class="form-login h-100 w-100 d-flex align-items-center m-auto">
+  <div class="card-login">
+    <div class="text-center">
+      <h2 class="display-4">{{t 'login.title'}}</h2>
+    </div>
+    <div class="card">
+      {{#if this.loginMode}}
+      <div class="card-body">
+        <div class="mb-4 text-center">
+          J'ai déjà un compte, je me connecte
+        </div>
+        <form class="mb-3" {{on "submit" (fn this.signin this.login this.password)}}>
+          <div class="row row-cols-1">
+            <Form::InputFloating class="col mb-2" @label={{t 'attributes.login' }} @value={{this.login}} />
+            <Form::InputFloating class="col mb-2" @label={{t 'attributes.password' }} @value={{this.password}} @inputType="password" />
+            <div class="col">
+              <button class="btn btn-primary" type="submit">{{t 'buttons.signin'}}</button>
+            </div>
+          </div>
+        </form>
+        <div class="">
+          <a href="#" class="" {{on 'click' this.toggleMode}}>{{t 'buttons.register'}}</a>
+        </div>
+      </div>
+      {{else}}
+      <div class="card-body">
+        <div class="mb-4 text-center">
+          J'ai n'ai pas de compte, j'en crée un
+        </div>
+        <form class="mb-3" {{on "submit" (fn this.register this.login this.password this.passwordConfirmation)}}>
+          <div class="row row-cols-1">
+            <Form::InputFloating class="col mb-2" @label={{t 'attributes.login' }} @value={{this.login}}
+              @errors={{this.model.user.errors.login}} />
+            <Form::InputFloating class="col mb-2" @label={{t 'attributes.password' }} @value={{this.password}}
+              @errors={{this.model.user.errors.password}}  @inputType="password" />
+            <Form::InputFloating class="col mb-2" @label={{t 'attributes.passwordConfirmation' }} @value={{this.passwordConfirmation}}
+              @errors={{this.model.user.errors.passwordConfirmation}} @inputType="password" />
+            <div class="col">
+              <button class="btn btn-primary" type="submit">{{t 'buttons.register'}}</button>
+            </div>
+          </div>
+        </form>
+        <div class="">
+          <a href="#" class="" {{on 'click' this.toggleMode}}>{{t 'buttons.alreadyRegistered'}}</a>
+        </div>
+      </div>
+      {{/if}}
+      {{#if this.errorMessage}}
+      <div class="card-footer">
+        <div class="text-center text-danger">{{this.errorMessage}}</div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>

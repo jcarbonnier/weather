@@ -1,0 +1,132 @@
+# --------------------------------------------------
+# DEFAULT API CONFIG
+#   Don't test when tagging
+# --------------------------------------------------
+.api:
+  image: $CONTAINER_TEST_IMAGE
+  extends: .rules_common
+  variables:
+    CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE/api:$CI_COMMIT_REF_SLUG
+    RAILS_ENV: test
+    DOMAIN: weather.test.com
+    POSTGRESQL_HOST: postgres
+    POSTGRESQL_USERNAME: postgres
+    POSTGRESQL_PASSWORD: postgres
+    SECRET_KEY_BASE: secret-for-testing-environment
+  # before_script:
+  #   - mkdir -p $HOME/.docker
+  #   - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+  #   # - cd api
+
+# --------------------------------------------------
+# BUILD STAGE
+# --------------------------------------------------
+build:api:
+  stage: build
+  image: $CI_REGISTRY/softier/commons/docker:latest
+  extends: .api
+  script:
+    # Change directory inside repository
+    - cd ./api
+    # - docker info
+    # - docker image ls
+    # - docker volume ls
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --target test --pull -t $CONTAINER_TEST_IMAGE .
+    - docker push $CONTAINER_TEST_IMAGE
+
+# --------------------------------------------------
+# TEST STAGE
+# --------------------------------------------------
+test:api_rspec:
+  stage: test
+  extends: .api
+  needs: ['build:api']
+  coverage: '/\(\d+\.\d+%\) covered/'
+  services:
+    - name: $CI_REGISTRY/softier/commons/bitnami-postgresql:16
+      alias: ${POSTGRESQL_HOST}
+  script:
+    - cd /api
+    - bundle exec rails db:create db:migrate
+    - bundle exec rspec --format progress --format RspecJunitFormatter --out rspec.xml
+    # Moving reports files inside project directory for uploading artifacts
+    - mv rspec.xml $CI_PROJECT_DIR/api/rspec.xml
+    - mv coverage $CI_PROJECT_DIR/api/
+  artifacts:
+    when: always
+    # --------------------
+    # Tests reports in gitlab GUI
+    # --------------------
+    reports:
+      junit: $CI_PROJECT_DIR/api/rspec.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: $CI_PROJECT_DIR/api/coverage/coverage.xml
+
+# --------------------------------------------------
+# QUALITY STAGE
+# --------------------------------------------------
+quality:api_rubocop:
+  stage: quality
+  extends: .api
+  needs: ['build:api']
+  allow_failure: true
+  script:
+    - cd /api
+    - bundle exec rubocop
+
+quality:api_fasterer:
+  stage: quality
+  extends: .api
+  needs: ['build:api']
+  allow_failure: true
+  script:
+    - cd /api
+    - bundle exec fasterer
+
+# quality:api_reek:
+#   stage: quality
+#   extends: .api
+#   needs: ['build:api']
+#   allow_failure: true
+#   script:
+#     - cd /api
+#     - bundle exec reek
+
+# --------------------------------------------------
+# SECURITY STAGE
+# --------------------------------------------------
+security:api_audit:
+  stage: security
+  extends: .api
+  needs: ['build:api']
+  allow_failure: true
+  script:
+    - cd /api
+    - bundle exec bundle audit check --update
+
+# test:api_brakeman:
+#   extends: .api
+#   stage: test
+#   allow_failure: true
+#   artifacts:
+#     name: brakeman_report
+#     when: always
+#     paths:
+#       - api/brakeman/
+#   script:
+#     - bundle exec brakeman --format html -o brakeman/index.html
+
+# test:dawnscanner:
+#   extends: .api
+#   stage: test
+#   allow_failure: true
+#   artifacts:
+#     name: dawnscanner_report
+#     when: always
+#     paths:
+#       - api/dawnscanner
+#   script:
+#     - mkdir dawnscanner
+#     - bundle exec dawn --html -zF dawnscanner/index.html .

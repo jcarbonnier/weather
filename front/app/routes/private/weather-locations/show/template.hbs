@@ -1,0 +1,123 @@
+{{page-title "Show"}}
+{{outlet}}
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="card-title">
+      <h1 class="dispay-4 text-center">
+        {{this.model.location.name}}
+        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal">
+          <i class="bi bi-trash"></i>
+        </button>
+      </h1>
+    </div>
+    <div class="row row-cols-3">
+      <div class="col">
+        <strong>Region</strong> : {{this.model.location.region}}
+      </div>
+      <div class="col">
+        <strong>Pays</strong> : {{this.model.location.country}}
+      </div>
+      <div class="col">
+        <strong>Coordonnées</strong> : {{this.model.location.lat}}, {{this.model.location.lon}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="card-title">
+      <h1 class="dispay-3 text-center mb-3">Prévision pour aujourd'hui {{moment-format this.forecast.currentDate
+        'D/M/Y'}}</h1>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4">
+        <div class="col">
+          <img src="{{this.forecast.current.condition.icon}}" />
+          <strong>Tendance</strong> : {{this.forecast.current.condition.text}}
+        </div>
+        <div class="col">
+          <strong>Température en °</strong> : {{this.forecast.current.temp_c}}°<br>
+          <strong>Température en F</strong> : {{this.forecast.current.temp_f}}<br>
+        </div>
+        <div class="col">
+          <strong>Vent</strong> : {{this.forecast.current.wind_kph}} km/h<br>
+          <strong>Direction</strong> : {{this.forecast.current.wind_dir}}<br>
+        </div>
+        <div class="col">
+          <strong>Précipitation</strong> : {{this.forecast.current.precip_mm}} mm<br>
+          <strong>humidity</strong> : {{this.forecast.current.humidity}}%<br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="carouselExampleCaptions" class="carousel slide bg-secondary">
+  <div class="carousel-indicators">
+    {{#each this.forecast.forecast.forecastday as |forecastday idx|}}
+    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to={{idx}} aria-current="true"
+      aria-label="Slide {{idx}}" class="{{if (eq idx 0) 'active'}}"></button>
+    {{/each}}
+  </div>
+  <div class="carousel-inner">
+    {{#each this.forecast.forecast.forecastday as |forecastday idx|}}
+    <div class="carousel-item {{if (eq idx 0) 'active'}}">
+      <img
+        src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mOsqgcAAXkA+8/afmAAAAAASUVORK5CYII="
+        class="d-block w-100" height="225">
+      <div class="carousel-caption d-none d-md-block mb-3">
+        <h5>
+          Prévision du {{moment-format forecastday.date 'D/M/Y'}}<br>
+          <img src="{{forecastday.day.condition.icon}}" class="">
+          {{forecastday.day.condition.text}}
+        </h5>
+        <div class="row row-cols-1 row-cols-md-2">
+          <div class="col">
+            <strong>Température max</strong> : {{forecastday.day.maxtemp_c}}°<br>
+            <strong>Température min</strong> : {{forecastday.day.mintemp_c}}°<br>
+          </div>
+          <div class="col">
+            <strong>Risque de pluie</strong> : {{forecastday.day.daily_chance_of_rain}}%<br>
+            <strong>Précipitations</strong> : {{forecastday.day.totalprecip_mm}}mm<br>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<div class="modal modal-lg fade" id="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modal-title">
+          {{t 'modals.confirm.title'}}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row row-cols-1">
+          <p>
+            Vous êtes sur le point du supprimer les prévisions pour la ville de {{this.model.location.name}}<br />
+            Etes-vous sur ?
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{t 'buttons.cancel'}}</button>
+        <button type="button" class="btn btn-primary" {{on "click" this.destroyBookmarkConfirmed}}>
+          {{t 'buttons.confirm'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

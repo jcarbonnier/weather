@@ -1,0 +1,167 @@
+# Default docker compose file
+#
+# Load and configure common services required by all environments
+# (development, staging, production...)
+#
+# Default target here is development, override if necessary for others environments
+
+# version: "3.8"
+
+# ========================================
+# Services
+# ========================================
+services:
+  # ==============================
+  # External services
+  # ==============================
+
+  # ====================
+  # NGINX Web server
+  # ====================
+  nginx:
+    build:
+      context: ./nginx
+      target: dev
+    command: ["nginx-debug", "-g", "daemon off;"]
+    ports:
+      - published: 80
+        target: 80
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - api
+      - front
+      # - sidekiq_monitor
+
+  # ==============================
+  # Internal services
+  # ==============================
+
+  # ====================
+  # EmberJS front app
+  # ====================
+  front:
+    build:
+      context: ./front
+      target: dev
+      args:
+        GITLAB_REGISTRY_TOKEN: ${GITLAB_REGISTRY_TOKEN}
+    env_file:
+      - .env
+    environment:
+      - BROCCOLI_ENABLED_MEMOIZE=true
+    volumes:
+      # Needed to improve Visual Studio refresh
+      - /front/dist
+      - /front/node_modules
+      - /front/tmp
+      # Needed to make development files refreshed
+      - ./front:/front:cached
+      # Needed to build production with yarn build (cf. package.json)
+      - ./nginx:/nginx
+
+  # ====================
+  # API
+  # ====================
+  api: &rails_service
+    image: weather-api
+    build:
+      context: ./api
+      target: dev
+    env_file:
+      - .env
+      - .env_db
+      - .env_redis
+    volumes:
+      - ./api:/api
+      - storage:/api/storage
+      - /api/tmp
+    depends_on:
+      - postgres
+      # - redis
+
+  # ====================
+  # API migrate
+  # ====================
+  migrate:
+    <<: *rails_service
+    command: bundle exec rails db:create db:migrate db:seed
+    restart: "no"
+
+  # ====================
+  # Sidekiq
+  # ====================
+  # sidekiq:
+  #   <<: *rails_service
+  #   command: bundle exec sidekiq -C config/sidekiq.yml
+
+  # ====================
+  # Sidekiq monitor
+  # ====================
+  # sidekiq_monitor:
+  #   build:
+  #     context: ./sidekiq_monitor
+  #     target: dev
+  #   env_file:
+  #     - .env
+  #     - .env_redis
+  #   depends_on:
+  #     - sidekiq
+
+  # ====================
+  # Redis server
+  # ====================
+  redis:
+    image: redis
+    env_file:
+      - .env_redis
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+
+  # ====================
+  # PostgreSQL primary server
+  # ====================
+  postgres:
+    image: postgres:16
+    env_file:
+      - .env_db
+    # environment:
+    #   POSTGRESQL_REPLICATION_MODE: master
+    #   # POSTGRES_HOST_AUTH_METHOD: "trust"
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ====================
+  # Adminer service
+  # ====================
+  adminer:
+    image: adminer
+    env_file:
+      - .env
+    expose:
+      - 8080
+    depends_on:
+      - postgres
+
+  # ====================
+  # Mailing system
+  # ====================
+  mailhog:
+    image: mailhog/mailhog:latest
+    environment:
+      - MH_UI_WEB_PATH=mailhog
+    expose:
+      - "1025:1025"
+      - "8025:8025"
+
+# ========================================
+# VOLUMES
+# ========================================
+volumes:
+  storage:
+  redis_data:
+  postgres_data:

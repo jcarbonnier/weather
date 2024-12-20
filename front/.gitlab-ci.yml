@@ -1,0 +1,82 @@
+# --------------------------------------------------
+# DEFAULT FRONT CONFIG
+#   Don't test when tagging
+# --------------------------------------------------
+.front:
+  image: $CONTAINER_TEST_IMAGE
+  only:
+    - main
+    - /^feature/
+  variables:
+    CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE/front:$CI_COMMIT_REF_SLUG
+    TRAVIS: "true"
+    CI: "true"
+    FRONT_PATH: "/"
+    # using gitlab variable instead of CI_JOB_TOKEN to prevent rebuilding image
+    GITLAB_REGISTRY_TOKEN: "${WEATHER_JOB_TOKEN}"
+
+# # --------------------------------------------------
+# # BUILD STAGE
+# # --------------------------------------------------
+# build:front:
+#   stage: build
+#   image: $CI_REGISTRY/softier/commons/docker:latest
+#   # rules:
+#   #   - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+#   #     when: never
+#   extends: .front
+#   script:
+#     - cd ./front
+#     - docker --version
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker build --target test --pull --build-arg GITLAB_REGISTRY_TOKEN=${WEBSITE_JOB_TOKEN} -t $CONTAINER_TEST_IMAGE .
+#     - docker push ${CONTAINER_TEST_IMAGE}
+
+# # --------------------------------------------------
+# # TEST STAGE
+# # --------------------------------------------------
+# test:front_ember:
+#   stage: test
+#   extends: .front
+#   needs: ['build:front']
+#   allow_failure: true
+#   coverage: '/Statements.+: \d+\.\d+/'
+#   script:
+#     - cd /front
+#     - npm run test:ember
+#     - mv qunit-report.txt $CI_PROJECT_DIR/front/qunit-report.txt
+#     - mv coverage $CI_PROJECT_DIR/front/
+#   artifacts:
+#     when: always
+#     # --------------------
+#     # Tests reports in gitlab GUI
+#     # --------------------
+#     reports:
+#       junit: $CI_PROJECT_DIR/front/qunit-report.txt
+#       coverage_report:
+#         coverage_format: cobertura
+#         path: $CI_PROJECT_DIR/front/coverage/cobertura-coverage.xml
+
+# # --------------------------------------------------
+# # QUALITY STAGE
+# # --------------------------------------------------
+# quality:front_eslint:
+#   stage: quality
+#   extends: .front
+#   needs: ['build:front']
+#   allow_failure: true
+#   script:
+#     - cd /front
+#     - npm run lint:js
+
+# # --------------------------------------------------
+# # SECURITY STAGE
+# # --------------------------------------------------
+# security:front_audit:
+#   stage: security
+#   extends: .front
+#   needs: ['build:front']
+#   allow_failure: true
+#   script:
+#     - cd /front
+#     - npm audit

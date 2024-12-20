@@ -1,0 +1,6 @@
+# -------------------------
+# PostgreSQL setup
+# -------------------------
+POSTGRESQL_HOST=postgres
+POSTGRESQL_USER=postgres
+POSTGRESQL_PASSWORD=postgres
