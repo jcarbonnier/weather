@@ -1,24 +1,27 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Le service de météo utilisé est le suivant : https://www.weatherapi.com/   
 
-Things you may want to cover:
+L'API s'appuie sur une architecture Model - Controller - Services   
 
-* Ruby version
+Le controller application_controller.rb gère les actions CRUD communes à tous les autres controllers   
 
-* System dependencies
+Des concerns controller ont été créés pour la gestion des logiques suivantes :
+- Authentication : gestion de l'authentification via un token JWT
+- Params : gestion des strong parameters définis dans les policies
 
-* Configuration
+Les controllers de l'API sont séparés en 2 familles : 
+- Public : aucune authentification n'est nécessaire
+- Private : authentification requise
 
-* Database creation
+Les policies sont gérées en s'appuyant sur le gem Pundit et séparées par famille de controller
+pour une meilleure lisibilité des restrictions.
 
-* Database initialization
+Chaque action d'écriture sur la DB est gérée par un service dédié utilisé permettant d'appliquer 
+la logique métier.   
+Par ex. services/record/weather_location/create_service.rb   
 
-* How to run the test suite
+Les services du dossier external permettent de communiquer avec des API tierces : 
+- external/net_http : envoie des requêtes HTTP vers l'extérieur
+- external/weather_api : envoie des requêtes HTTP du service de météo
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
