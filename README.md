@@ -7,11 +7,6 @@
 [![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)](https://sass-lang.com/)
 [![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)](https://www.nginx.com/)
 
-[![Latest Release](https://gitlab.ad.softier.fr/softier/weather/-/badges/release.svg)](https://gitlab.ad.softier.fr/softier/weather/-/releases)
-[![pipeline status](https://gitlab.ad.softier.fr/softier/weather/badges/main/pipeline.svg)](https://gitlab.ad.softier.fr/softier/weather/-/commits/main)
-[![API coverage](https://gitlab.ad.softier.fr/softier/weather/badges/main/coverage.svg?job=test:api_rspec&key_text=API%20cov.)](https://gitlab.ad.softier.fr/softier/weather/-/commits/main/api)
-[![Front coverage](https://gitlab.ad.softier.fr/softier/weather/badges/main/coverage.svg?job=test:front_ember&key_text=Front%20cov.)](https://gitlab.ad.softier.fr/softier/weather/-/commits/main/front)
-
 
 ## Requirements
 
@@ -48,6 +43,8 @@ cp _doc/docker/env .env
 cp _doc/docker/env_db .env_db
 cp _doc/docker/env_redis .env_redis
 ```
+
+Adaptez les secrets qui n'ont pas été poussés sur le repository.
 
 Lancer le projet :   
 ```
