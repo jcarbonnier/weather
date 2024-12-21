@@ -1,0 +1,28 @@
+# --------------------------------------------------
+# DEFAULT API CONFIG
+# --------------------------------------------------
+.monitor:
+  image: $CONTAINER_TEST_IMAGE
+  extends: .rules_common
+  variables:
+    SIDEKIQ_MONITOR_PATH: /sidekiq
+    REDIS_URL: redis://redis:6379/0
+    SECRET_KEY_BASE: 123456789z123456789z123456789z123456789z123456789z123456789z1234
+    CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE/sidekiq_monitor:$CI_COMMIT_REF_SLUG
+  before_script:
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+    - cd sidekiq_monitor
+
+# --------------------------------------------------
+# BUILD STAGE
+# --------------------------------------------------
+build:sidekiq_monitor:
+  stage: build
+  image: $CI_REGISTRY/softier/commons/docker:latest
+  extends: .monitor
+  script:
+    - docker --version
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $CONTAINER_TEST_IMAGE .
+    - docker push $CONTAINER_TEST_IMAGE

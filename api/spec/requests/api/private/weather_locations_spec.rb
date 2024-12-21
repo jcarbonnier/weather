@@ -1,7 +1,7 @@
-# rubocop:disable RSpec/EmptyExampleGroup, RSpec/VariableName, RSpec/MultipleMemoizedHelpers
+# rubocop:disable RSpec/EmptyExampleGroup, RSpec/VariableName, RSpec/MultipleMemoizedHelpers, RSpec/MetadataStyle
 require 'swagger_helper'
 
-RSpec.describe 'Api::Private::WeatherLocations', type: :request do
+RSpec.describe 'Api::Private::WeatherLocations', type: :request, vcr: true do
   let(:Authorization) { "Bearer #{current_user.token}" }
 
   # -------------------------
@@ -52,39 +52,43 @@ RSpec.describe 'Api::Private::WeatherLocations', type: :request do
       end
     end
 
-    # post('create weather_location') do
-    #   tags        'Private'
-    #   description 'Create a weather_location'
-    #   consumes    'application/vnd.api+json'
-    #   produces    'application/vnd.api+json'
-    #   security    [bearer_auth: []]
+    post('create weather_location') do
+      tags        'Private'
+      description 'Create a weather_location'
+      consumes    'application/vnd.api+json'
+      produces    'application/vnd.api+json'
+      security    [bearer_auth: []]
+      description <<~DESC
+        <b>Create weather locations</b>
 
-    #   parameter name: :data, in: :body, required: true,
-    #             description: 'Attributes name duration url_name are required.',
-    #             schema: { type:       :json,
-    #                       example:    Swagger::Schemas::WeatherLocation::WRITE_EXAMPLE,
-    #                       properties: Swagger::Schemas::WeatherLocation::CREATE_ATTRIBUTES,
-    #                       required:   %w[data] }
+        Secured by user bearer token, create a location that belongs to user
+      DESC
 
-    #   response 201, 'WeatherLocation created' do
-    #     schema(Swagger::Schemas::WeatherLocation::SINGLE_ANSWER)
-    #     let(:data) do
-    #       { data: { type:          'weather_locations',
-    #                 attributes:    attributes_for(:weather_location),
-    #                 relationships: { calendar: { data: { type: 'calendars', id: calendar.id } } } } }
-    #     end
-    #     run_test!
-    #   end
+      parameter name: :data, in: :body, required: true,
+                description: 'Attributes name duration url_name are required.',
+                schema: { type:       :json,
+                          example:    Swagger::Schemas::WeatherLocation::WRITE_EXAMPLE,
+                          properties: Swagger::Schemas::WeatherLocation::CREATE_ATTRIBUTES,
+                          required:   %w[data] }
 
-    #   response 422, 'Invalid attribute' do
-    #     schema({ '$ref' => '#/components/schemas/ValidationError' })
-    #     let(:data) do
-    #       { data: { type:       'weather_locations',
-    #                 attributes: attributes_for(:weather_location).delete(:name) } }
-    #     end
-    #     run_test!
-    #   end
-    # end
+      response 201, 'WeatherLocation created' do
+        schema(Swagger::Schemas::WeatherLocation::SINGLE_ANSWER)
+        let(:data) do
+          { data: { type:       'weather_locations',
+                    attributes: attributes_for(:weather_location) } }
+        end
+        run_test!
+      end
+
+      response 422, 'Invalid attribute' do
+        schema({ '$ref' => '#/components/schemas/ValidationError' })
+        let(:data) do
+          { data: { type:       'weather_locations',
+                    attributes: attributes_for(:weather_location).delete(:name) } }
+        end
+        run_test!
+      end
+    end
   end
 
   # -------------------------
@@ -157,4 +161,4 @@ RSpec.describe 'Api::Private::WeatherLocations', type: :request do
     end
   end
 end
-# rubocop:enable RSpec/EmptyExampleGroup, RSpec/VariableName, RSpec/MultipleMemoizedHelpers
+# rubocop:enable RSpec/EmptyExampleGroup, RSpec/VariableName, RSpec/MultipleMemoizedHelpers, RSpec/MetadataStyle

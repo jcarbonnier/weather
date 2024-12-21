@@ -31,7 +31,7 @@ services:
     depends_on:
       - api
       - front
-      # - sidekiq_monitor
+      - sidekiq_monitor
 
   # ==============================
   # Internal services
@@ -78,7 +78,7 @@ services:
       - /api/tmp
     depends_on:
       - postgres
-      # - redis
+      - redis
 
   # ====================
   # API migrate
@@ -91,22 +91,22 @@ services:
   # ====================
   # Sidekiq
   # ====================
-  # sidekiq:
-  #   <<: *rails_service
-  #   command: bundle exec sidekiq -C config/sidekiq.yml
+  sidekiq:
+    <<: *rails_service
+    command: bundle exec sidekiq -C config/sidekiq.yml
 
   # ====================
   # Sidekiq monitor
   # ====================
-  # sidekiq_monitor:
-  #   build:
-  #     context: ./sidekiq_monitor
-  #     target: dev
-  #   env_file:
-  #     - .env
-  #     - .env_redis
-  #   depends_on:
-  #     - sidekiq
+  sidekiq_monitor:
+    build:
+      context: ./sidekiq_monitor
+      target: dev
+    env_file:
+      - .env
+      - .env_redis
+    depends_on:
+      - sidekiq
 
   # ====================
   # Redis server

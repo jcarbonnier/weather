@@ -4,6 +4,102 @@ info:
   title: API appointment
   version: v1
 paths:
+  "/api/locations":
+    get:
+      summary: list locations
+      tags:
+      - Private
+      description: |
+        <b>Get weather distant locations</b>
+
+        Secured by user bearer token, the locations are external
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: filter[name]
+        in: query
+        required: true
+        description: Filter locations by location id
+        example: singapour
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Weather_locations are listed
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          example: weather_locations
+                        attributes:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation name
+                              example: Paris
+                            region:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation region
+                              example: Eure
+                            country:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation country
+                              example: France
+                            lat:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation latitude
+                              example: 33.78
+                            lon:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation longitude
+                              example: 48.78
+                          required:
+                          - name
+                          - country
+                          - lat
+                          - lon
+                        relationships:
+                          type: object
+                          properties:
+                            weather_forecasts:
+                              type: object
+                              description: Forecasts.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: weather_forecasts
+                            users:
+                              type: object
+                              description: Users.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: users
+                      required:
+                      - type
+                      - attributes
+                      - relationships
+                  meta:
+                    "$ref": "#/components/schemas/CollectionAnswerMeta"
+                required:
+                - data
   "/api/users/{id}":
     get:
       summary: show user
@@ -67,6 +163,90 @@ paths:
           description: not authorized
         '404':
           description: not found
+  "/api/weather_forecasts":
+    get:
+      summary: list weather_forecasts
+      tags:
+      - Private
+      description: |
+        <b>Get weather forecasts</b>
+
+        Secured by user bearer token, the forecasts must belong to user
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: filter[weather_location_id]
+        in: query
+        required: false
+        description: Filter forecasts by location id
+        example: 1
+        schema:
+          type: integer
+      - name: filter[current_date]
+        in: query
+        required: false
+        description: Filter forecasts by current _date
+        example: '2024-01-30'
+        schema:
+          type: date
+      responses:
+        '200':
+          description: weather_forecasts are filtered
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          example: weather_forecasts
+                        attributes:
+                          type: object
+                          properties:
+                            current_date:
+                              type: date
+                              nullable: true
+                              description: WeatherForecast date
+                              example: '2024-01-01'
+                            current:
+                              type: object
+                              nullable: true
+                              description: WeatherForecast current
+                            forecast:
+                              type: object
+                              nullable: true
+                              description: WeatherForecast
+                              example: France
+                          required:
+                          - current_date
+                          - current
+                          - forecast
+                        relationships:
+                          type: object
+                          properties:
+                            weather_location:
+                              type: object
+                              description: Location.
+                              example:
+                                data:
+                                  id: '1'
+                                  type: weather_locations
+                      required:
+                      - type
+                      - attributes
+                      - relationships
+                  meta:
+                    "$ref": "#/components/schemas/CollectionAnswerMeta"
+                required:
+                - data
   "/api/weather_locations":
     get:
       summary: list weather_locations
@@ -163,6 +343,187 @@ paths:
                     "$ref": "#/components/schemas/CollectionAnswerMeta"
                 required:
                 - data
+    post:
+      summary: create weather_location
+      tags:
+      - Private
+      description: |
+        <b>Create weather locations</b>
+
+        Secured by user bearer token, create a location that belongs to user
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: WeatherLocation created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: '1'
+                      type:
+                        type: string
+                        example: weather_locations
+                      attributes:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation name
+                            example: Paris
+                          region:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation region
+                            example: Eure
+                          country:
+                            type: string
+                            nullable: true
+                            description: WeatherLocation country
+                            example: France
+                          lat:
+                            type: string
+                            nullable: false
+                            description: WeatherLocation latitude
+                            example: 33.78
+                          lon:
+                            type: string
+                            nullable: false
+                            description: WeatherLocation longitude
+                            example: 48.78
+                        required:
+                        - name
+                        - country
+                        - lat
+                        - lon
+                      relationships:
+                        type: object
+                        properties:
+                          weather_forecasts:
+                            type: object
+                            description: Forecasts.
+                            example:
+                              data:
+                              - id: '1'
+                                type: weather_forecasts
+                          users:
+                            type: object
+                            description: Users.
+                            example:
+                              data:
+                              - id: '1'
+                                type: users
+                    required:
+                    - type
+                    - attributes
+                    - relationships
+                required:
+                - data
+        '422':
+          description: Invalid attribute
+          content:
+            application/vnd.api+json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: json
+              example:
+                data:
+                  type: weather_locations
+                  attributes:
+                    name: Paris
+                    region: Ile-De-France
+                    country: France
+                    lat: 33.78
+                    lon: 48.43
+              properties:
+                data:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: '1'
+                        type:
+                          type: string
+                          example: weather_locations
+                        attributes:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation name
+                              example: Paris
+                            region:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation region
+                              example: Eure
+                            country:
+                              type: string
+                              nullable: true
+                              description: WeatherLocation country
+                              example: France
+                            lat:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation latitude
+                              example: 33.78
+                            lon:
+                              type: string
+                              nullable: false
+                              description: WeatherLocation longitude
+                              example: 48.78
+                          required:
+                          - name
+                          - country
+                          - lat
+                          - lon
+                        relationships:
+                          type: object
+                          properties:
+                            weather_forecasts:
+                              type: object
+                              description: Forecasts.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: weather_forecasts
+                            users:
+                              type: object
+                              description: Users.
+                              example:
+                                data:
+                                - id: '1'
+                                  type: users
+                      required:
+                      - type
+                      - attributes
+                      - relationships
+                  required:
+                  - name
+                  - region
+                  - country
+                  - lat
+                  - lon
+              required:
+              - data
+        required: true
+        description: Attributes name duration url_name are required.
   "/api/weather_locations/{id}":
     parameters:
     - name: id

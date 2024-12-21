@@ -33,7 +33,7 @@ module Record
         ActiveRecord::Base.transaction do
           input[:record].save!
           input[:record].users << Current.user
-          fetch_forecast!(input[:record])
+          create_forecast!(input[:record])
         end
         Success(input[:record])
       rescue ActiveRecord::RecordInvalid
@@ -43,23 +43,20 @@ module Record
       private
 
       # Fetching forecast
-      def fetch_forecast!(record)
+      def create_forecast!(record)
+        return true if forecast_already_exists?(record)
+
         result = External::WeatherApi::ForecastService.call(q: "#{record.lat},#{record.lon}")
         forecast_failure!(record, result.failure) if result.failure?
 
-        forecast_attributes = format_forecast_attributes(result.success, record)
+        forecast_attributes = External::WeatherApi::BaseService.forecast_to_attributes(result.success, record)
         result = Record::WeatherForecast::CreateService.call(params: forecast_attributes)
-        Rails.logger.debug { "Forecast result: #{result.inspect}" }
-
         forecast_failure!(record, result.failure) if result.failure?
       end
 
-      # Format forecast json response
-      def format_forecast_attributes(json_response, record)
-        { current_date:        Time.zone.today,
-          current:             json_response['current'],
-          forecast:            json_response['forecast'],
-          weather_location_id: record.id }
+      # Check if forecast already exists in DB
+      def forecast_already_exists?(record)
+        ::WeatherForecast.exists?(weather_location_id: record.id, current_date: Time.zone.today)
       end
 
       # Raise exception to rollback transaction

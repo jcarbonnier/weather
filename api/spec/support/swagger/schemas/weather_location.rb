@@ -79,17 +79,13 @@ module Swagger
 
       WRITE_EXAMPLE = {
         data: {
-          type:          'weather_locations',
-          attributes:    {
+          type:       'weather_locations',
+          attributes: {
             name:    'Paris',
             region:  'Ile-De-France',
             country: 'France',
             lat:     33.78,
             lon:     48.43
-          },
-          relationships: {
-            company:      { data: { type: 'companies', id: '1' } },
-            intervention: { data: { type: 'interventions', id: '1' } }
           }
         }
       }.freeze

@@ -1,0 +1,67 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.weatherapi.com/v1/search.json?key=0a5dbc7ae15448b7ace204844241812&q=singapour
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      User-Agent:
+      - Ruby
+      Host:
+      - api.weatherapi.com
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 20 Dec 2024 23:19:00 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      Server:
+      - BunnyCDN-FR1-951
+      Cdn-Pullzone:
+      - '93447'
+      Cdn-Uid:
+      - 8fa3a04a-75d9-4707-8056-b7b33c8ac7fe
+      Cdn-Requestcountrycode:
+      - FR
+      Cache-Control:
+      - public, max-age=180
+      X-Weatherapi-Qpm-Left:
+      - '4999842'
+      Cdn-Proxyver:
+      - '1.06'
+      Cdn-Requestpullsuccess:
+      - 'True'
+      Cdn-Requestpullcode:
+      - '200'
+      Cdn-Cachedat:
+      - 12/20/2024 23:17:26
+      Cdn-Edgestorageid:
+      - '946'
+      Cdn-Status:
+      - '200'
+      Cdn-Requesttime:
+      - '1'
+      Cdn-Requestid:
+      - d0de9e2ba3b62384fc0121f0fd319858
+      Cdn-Cache:
+      - HIT
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"id":2285382,"name":"Singapour","region":"","country":"Singapour","lat":1.29,"lon":103.86,"url":"singapour-singapour"}]'
+  recorded_at: Fri, 20 Dec 2024 23:19:00 GMT
+recorded_with: VCR 6.3.1

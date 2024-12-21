@@ -35,7 +35,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_19_000011) do
     t.date "current_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["weather_location_id", "current_date"], name: "index_location_and_date"
+    t.index ["weather_location_id", "current_date"], name: "index_location_and_date", unique: true
   end
 
   create_table "weather_locations", force: :cascade do |t|

@@ -7,7 +7,7 @@ RSpec.describe Private::WeatherForecastPolicy, type: :policy do
     let(:user) { build(:user) }
 
     it 'grants limited index params' do
-      expect(current_policy.new(user, WeatherAverage).permitted_params_for_index).to eq([{ filter: %w[id include weather_location_id] }])
+      expect(current_policy.new(user, WeatherAverage).permitted_params_for_index).to eq([{ filter: %w[id include weather_location_id current_date] }])
     end
   end
 

@@ -11,7 +11,8 @@ module External
         Success(
           q:    options[:q],
           days: options[:days] || 5,
-          lang: options[:lang] || 'fr'
+          lang: options[:lang] || 'fr',
+          dt:   options[:dt] || nil
         )
       end
 
@@ -43,21 +44,20 @@ module External
       private
 
       def forecast_request_attributes(input)
-        {
-          method:       'Get',
+        { method:       'Get',
           url:          "#{ENV.fetch('WEATHER_API_DOMAIN')}/v1/forecast.json",
           headers:      api_headers,
           query_params: api_query_params(input),
-          max_retries:  0
-        }
+          max_retries:  0 }
       end
 
       def api_query_params(input)
         super.merge(
           q:    input[:q],
+          dt:   input[:dt],
           days: input[:days],
-          lang: input[:lang] || 'fr'
-        )
+          lang: input[:lang]
+        ).compact
       end
     end
   end

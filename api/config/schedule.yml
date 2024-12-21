@@ -1,0 +1,6 @@
+# Refresh current forecast
+refresh_current_weather_locations:
+  cron: "*/30 * * * *"
+  class: "Schedules::WeatherLocation::RefreshCurrentLocationsJob"
+  queue: slow
+  retry: 0

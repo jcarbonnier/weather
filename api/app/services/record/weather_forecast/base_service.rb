@@ -4,8 +4,9 @@ module Record
     #
     # Define here common service methods
     class BaseService < Record::BaseService
-      # protected
-
+      # ---------------------------------------------
+      # Instance methods
+      # ---------------------------------------------
       # Record model class
       def record_model
         ::WeatherForecast

@@ -12,7 +12,7 @@
 #
 # Indexes
 #
-#  index_location_and_date  (weather_location_id,current_date)
+#  index_location_and_date  (weather_location_id,current_date) UNIQUE
 #
 require 'rails_helper'
 

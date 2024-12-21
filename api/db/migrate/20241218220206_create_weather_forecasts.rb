@@ -8,6 +8,8 @@ class CreateWeatherForecasts < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
-    add_index :weather_forecasts, %i[weather_location_id current_date], name: 'index_location_and_date'
+    add_index :weather_forecasts, %i[weather_location_id current_date],
+              name:   'index_location_and_date',
+              unique: true
   end
 end

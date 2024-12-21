@@ -12,13 +12,13 @@
 #
 # Indexes
 #
-#  index_location_and_date  (weather_location_id,current_date)
+#  index_location_and_date  (weather_location_id,current_date) UNIQUE
 #
 FactoryBot.define do
   factory :weather_forecast do
-    weather_location
+    association :weather_location
 
-    current_date { '2024-12-18' }
+    sequence(:current_date) { |n| Time.zone.today + n.days }
     current do
       {
         last_updated_epoch: 1_734_558_300,

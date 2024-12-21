@@ -44,8 +44,6 @@ cp _doc/docker/env_db .env_db
 cp _doc/docker/env_redis .env_redis
 ```
 
-Adaptez les secrets qui n'ont pas été poussés sur le repository.
-
 Lancer le projet :   
 ```
 make build

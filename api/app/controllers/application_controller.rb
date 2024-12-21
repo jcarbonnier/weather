@@ -125,15 +125,15 @@ class ApplicationController < ActionController::API
   #
   # @param HttpQueryParams : request query params
   # @return HttpResponse : http response formatted
-  def update
-    authorize current_model
-    @resource ||= policy_scope(current_model).find(params[:id])
-    authorize @resource
-    result = service_for_update.call(record: @resource, params: params_for_update)
-    service_write_failure(result.failure) if result.failure?
+  # def update
+  #   authorize current_model
+  #   @resource ||= policy_scope(current_model).find(params[:id])
+  #   authorize @resource
+  #   result = service_for_update.call(record: @resource, params: params_for_update)
+  #   service_write_failure(result.failure) if result.failure?
 
-    respond_with @resource, head: 200
-  end
+  #   respond_with @resource, head: 200
+  # end
 
   ##
   # DELETE record

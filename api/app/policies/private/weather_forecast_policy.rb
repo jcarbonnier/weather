@@ -15,7 +15,7 @@ module Private
     # Strong parameters
     def permitted_params_for_index
       [
-        filter: %w[id include weather_location_id]
+        filter: %w[id include weather_location_id current_date]
       ]
     end
 

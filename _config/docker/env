@@ -17,11 +17,11 @@ SECRET_KEY_BASE=...
 
 # -------------------------
 # Gitlab packages token (private package registry)
-# Needed to pull private packages
 # -------------------------
+GITLAB_REGISTRY_TOKEN=...
 
 # -------------------------
 # External api secrets
 # -------------------------
 WEATHER_API_DOMAIN=https://api.weatherapi.com
-# WEATHER_API_KEY
+WEATHER_API_KEY=...

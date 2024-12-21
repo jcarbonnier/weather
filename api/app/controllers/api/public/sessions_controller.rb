@@ -12,10 +12,6 @@ class Api::Public::SessionsController < Api::Public::BaseController
 
   protected
 
-  def service_for_create
-    Record::User::CreateService
-  end
-
   def invalid_user(message)
     user = User.new
     user.errors.add(:base, message)

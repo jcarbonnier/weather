@@ -9,15 +9,20 @@ export default class PrivateWeatherLocationsShowRoute extends Route {
   // ==================================================
   @service store;
   @service router;
+  @service moment;
 
   // ==================================================
   // HANDLERS
   // ==================================================
   model(params) {
+    console.log("Moment", this.moment.moment().format('Y-M-D'));
     return hash({
       location: this.store.findRecord('weather-location', params.id),
       forecasts: this.store.query('weather-forecast', {
-        filter: { weather_location_id: params.id, current_date: Date.today }
+        filter: {
+          current_date: this.moment.moment().format('Y-M-D'),
+          weather_location_id: params.id,
+        }
       }),
     });
   }
