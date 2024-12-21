@@ -8,6 +8,11 @@
 [![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)](https://www.nginx.com/)
 
 
+## Demo
+
+Accéder à la démo : https://weather.softier.fr
+
+
 ## Requirements
 
 - Docker
